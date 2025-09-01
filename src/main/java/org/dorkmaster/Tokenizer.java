@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Tokenizer {
-
     public record Tokens(String prefix, List<String> terms) {
     }
 

@@ -3,7 +3,6 @@ package org.dorkmaster;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.spec.MessageCreateSpec;
-import discord4j.discordjson.json.EmojiData;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;

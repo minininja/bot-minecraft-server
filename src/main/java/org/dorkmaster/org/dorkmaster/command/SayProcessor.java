@@ -4,7 +4,6 @@ import discord4j.core.object.entity.Message;
 import org.dorkmaster.CommandProcessor;
 import org.dorkmaster.MinecraftServer;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 

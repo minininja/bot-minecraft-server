@@ -33,9 +33,6 @@ public class RingBuffer<T> {
     }
 
     public synchronized List<T> tail(int n) {
-//        if (n > buffer.size()) {
-//            throw new IndexOutOfBoundsException("n cannot be greater than buffer size");
-//        }
         int start = (tail - Math.min(buffer.size(), n) + capacity) % capacity;
         return buffer.subList(start, tail);
     }

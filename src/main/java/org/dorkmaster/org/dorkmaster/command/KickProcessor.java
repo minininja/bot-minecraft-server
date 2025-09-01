@@ -3,9 +3,6 @@ package org.dorkmaster.org.dorkmaster.command;
 import discord4j.core.object.entity.Message;
 import org.dorkmaster.CommandProcessor;
 import org.dorkmaster.MinecraftServer;
-import org.dorkmaster.SilentCommandProcessor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Set;
