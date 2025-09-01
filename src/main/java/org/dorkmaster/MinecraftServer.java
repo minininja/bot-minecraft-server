@@ -42,7 +42,7 @@ public class MinecraftServer {
                     logBuffer.add(line);
                 }
             } catch (IOException e) {
-                logger.warn("Error reading from child process: " + e.getMessage());
+                logger.warn("Error reading from child process: {}", e.getMessage());
             }
         });
 

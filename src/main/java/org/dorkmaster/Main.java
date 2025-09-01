@@ -1,5 +1,7 @@
 package org.dorkmaster;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
@@ -14,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
     protected static final Logger logger = LoggerFactory.getLogger(Main.class);
@@ -21,21 +24,38 @@ public class Main {
     protected static String UNHELP = System.getenv("UNHELP");
     protected static MinecraftServer server = new MinecraftServer();
 
-    public static boolean checkRole(Set<String> reqRoles, Message message) {
-        // TODO think about caching this
-        Set<String> roles = new HashSet<>();
-        Member member = message.getAuthorAsMember().block();
+    protected static Cache<Snowflake, Set<String>> cache = Caffeine.newBuilder()
+            .expireAfterWrite(5, TimeUnit.MINUTES)
+            .maximumSize(100)
+            .build();
+
+    public static Set<String> getRoles(Member member) {
+        Snowflake id = member.getId();
+        if (cache.asMap().containsKey(id)) {
+            return cache.getIfPresent(id);
+        }
+
+        final Set<String> roles = new HashSet<>();
         member.getRoles().map(Role::getName)
                 .collectList()
                 .subscribe(roleNames -> {
                     roles.addAll(roleNames);
                 });
+        cache.put(id, roles);
+        return roles;
+    }
 
-        for (String reqRole : reqRoles) {
-            if (roles.contains(reqRole)) {
-                return true;
+    public static boolean checkRole(Set<String> reqRoles, Message message) {
+        Member member = message.getAuthorAsMember().block();
+        if (null != member) {
+            Set<String> roles = getRoles(member);
+            for (String reqRole : reqRoles) {
+                if (roles.contains(reqRole)) {
+                    return true;
+                }
             }
         }
+
         return false;
     }
 
@@ -132,12 +152,11 @@ public class Main {
                         }
                     } catch (Throwable t) {
                         // There's a number of small annoying errors happening.  This is a stop gap to resolve those.
-                        logger.warn("Unexpected exception: '{}'" +t.getMessage(), t);
+                        logger.warn("Unexpected exception: '{}'", t.getMessage(), t);
                     }
                 });
 
-        while (true) {
-            Thread.sleep(60 * 60 * 1000);
-        }
+        // wait until we're shutdown
+        discordClient.onDisconnect().block();
     }
 }
